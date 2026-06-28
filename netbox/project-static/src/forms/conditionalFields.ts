@@ -1,3 +1,5 @@
+import { getElements } from '../util';
+
 const FORM_SELECTOR = 'form.object-edit';
 const FIELD_WRAPPER_SELECTOR = '.row.mb-3';
 
@@ -24,16 +26,17 @@ function isVisible(conditions: Conditions): boolean {
 }
 
 function updateVisibility(): void {
-  document.querySelectorAll<HTMLElement>('[data-visible-when]').forEach(el => {
+  for (const el of getElements<HTMLElement>('[data-visible-when]')) {
     const conditions: Conditions = JSON.parse(el.dataset.visibleWhen!);
     const wrapper = el.closest<HTMLElement>(FIELD_WRAPPER_SELECTOR);
     wrapper?.classList.toggle('d-none', !isVisible(conditions));
-  });
+  }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  updateVisibility();
+export function initConditionalFields(): void {
   const form = document.querySelector(FORM_SELECTOR);
-  form?.addEventListener('change', updateVisibility);
-  form?.addEventListener('input', updateVisibility);
-});
+  if (!form) return;
+  updateVisibility();
+  form.addEventListener('change', updateVisibility);
+  form.addEventListener('input', updateVisibility);
+}

@@ -1,10 +1,17 @@
 import { initClearField } from './clearField';
+import { initConditionalFields } from './conditionalFields';
 import { initFormElements } from './elements';
 import { initFilterModifiers } from './filterModifiers';
 import { initSpeedSelector } from './speedSelector';
 
 export function initForms(): void {
-  for (const func of [initFormElements, initSpeedSelector, initFilterModifiers, initClearField]) {
+  for (const func of [
+    initFormElements,
+    initSpeedSelector,
+    initFilterModifiers,
+    initClearField,
+    initConditionalFields,
+  ]) {
     func();
   }
 }
