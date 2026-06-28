@@ -1,4 +1,5 @@
 import inspect
+import json
 import logging
 import os
 import re
@@ -53,7 +54,7 @@ class ScriptVariable:
     """
     form_field = forms.CharField
 
-    def __init__(self, label='', description='', default=None, required=True, widget=None):
+    def __init__(self, label='', description='', default=None, required=True, widget=None, visible_when=None):
 
         # Initialize field attributes
         if not hasattr(self, 'field_attrs'):
@@ -67,6 +68,7 @@ class ScriptVariable:
         if widget:
             self.field_attrs['widget'] = widget
         self.field_attrs['required'] = required
+        self.visible_when = visible_when
 
     def as_field(self):
         """
@@ -78,6 +80,8 @@ class ScriptVariable:
                 form_field.widget.attrs['class'] += ' form-control'
             else:
                 form_field.widget.attrs['class'] = 'form-control'
+        if self.visible_when is not None:
+            form_field.widget.attrs['data-visible-when'] = json.dumps(self.visible_when)
 
         return form_field
 
