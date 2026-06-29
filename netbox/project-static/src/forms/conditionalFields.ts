@@ -4,6 +4,7 @@ const FORM_SELECTOR = 'form.object-edit';
 const FIELD_WRAPPER_SELECTOR = '.row.mb-3';
 
 type Conditions = Record<string, unknown>;
+type FormField = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
 
 function getFieldValue(name: string): string | undefined {
   const field = document.querySelector<HTMLInputElement>(
@@ -29,7 +30,19 @@ function updateVisibility(): void {
   for (const el of getElements<HTMLElement>('[data-visible-when]')) {
     const conditions: Conditions = JSON.parse(el.dataset.visibleWhen!);
     const wrapper = el.closest<HTMLElement>(FIELD_WRAPPER_SELECTOR);
-    wrapper?.classList.toggle('d-none', !isVisible(conditions));
+    const visible = isVisible(conditions);
+    wrapper?.classList.toggle('d-none', !visible);
+    if (
+      el instanceof HTMLInputElement ||
+      el instanceof HTMLSelectElement ||
+      el instanceof HTMLTextAreaElement
+    ) {
+      const isRequired = visible && el.dataset.requiredWhenVisible === 'true';
+      (el as FormField).required = isRequired;
+      wrapper
+        ?.querySelector<HTMLElement>(`label[for="${el.id}"]`)
+        ?.classList.toggle('required', isRequired);
+    }
   }
 }
 

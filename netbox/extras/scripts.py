@@ -82,6 +82,9 @@ class ScriptVariable:
                 form_field.widget.attrs['class'] = 'form-control'
         if self.visible_when is not None:
             form_field.widget.attrs['data-visible-when'] = json.dumps(self.visible_when)
+            if form_field.required:
+                form_field.widget.attrs['data-required-when-visible'] = 'true'
+            form_field.required = False  # Conditional fields are never unconditionally required
 
         return form_field
 
