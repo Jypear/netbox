@@ -290,6 +290,20 @@ All custom script variables support the following default options:
 * `label` - The field name to be displayed in the rendered form
 * `required` - Indicates whether the field is mandatory (all fields are required by default)
 * `widget` - The class of form widget to use (see the [Django documentation](https://docs.djangoproject.com/en/stable/ref/forms/widgets/))
+* `visible_when` - A dictionary mapping other variable names to the value(s) they must hold for this field to be displayed. The expected value can be a specific value, a list of acceptable values, or `'*'` to match any non-empty value. The field is hidden (and not enforced as required) when its conditions aren't met. For example:
+
+```python
+deploy_switches = BooleanVar()
+switch_count = IntegerVar(
+    visible_when={'deploy_switches': 'true'}
+)
+
+device_role = ChoiceVar(choices=DEVICE_ROLE_CHOICES)
+switch_model = ObjectVar(
+    model=DeviceType,
+    visible_when={'device_role': 'switch'}
+)
+```
 
 ### StringVar
 
