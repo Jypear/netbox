@@ -1,3 +1,5 @@
+import TomSelect from 'tom-select';
+import type { Instance as FlatpickrInstance } from 'flatpickr/dist/types/instance';
 import { getElements } from '../util';
 
 const FORM_SELECTOR = 'form.object-edit';
@@ -44,6 +46,35 @@ function isVisible(conditions: Conditions): boolean {
   );
 }
 
+function resetFieldValue(el: FormField): void {
+  if (el instanceof HTMLSelectElement) {
+    const tomselect = (el as HTMLSelectElement & { tomselect?: TomSelect }).tomselect;
+    if (tomselect) {
+      tomselect.clear();
+      return;
+    }
+    for (const option of el.options) {
+      option.selected = option.defaultSelected;
+    }
+    return;
+  }
+  if (el instanceof HTMLInputElement && (el.type === 'checkbox' || el.type === 'radio')) {
+    el.checked = el.defaultChecked;
+    return;
+  }
+
+  const flatpickr = (el as HTMLInputElement & { _flatpickr?: FlatpickrInstance })._flatpickr;
+  if (flatpickr) {
+    if (el.defaultValue) {
+      flatpickr.setDate(el.defaultValue, false);
+    } else {
+      flatpickr.clear(false);
+    }
+    return;
+  }
+  el.value = el.defaultValue;
+}
+
 function applyVisibility(el: HTMLElement): void {
   const conditions: Conditions = JSON.parse(el.dataset.visibleWhen!);
   const wrapper = el.closest<HTMLElement>(FIELD_WRAPPER_SELECTOR);
@@ -52,6 +83,8 @@ function applyVisibility(el: HTMLElement): void {
   wrapper?.classList.toggle('d-none', !visible);
 
   if (!isFormField(el)) return;
+
+  if (!visible) resetFieldValue(el);
 
   const required = visible && el.dataset.requiredWhenVisible === 'true';
   el.required = required;
